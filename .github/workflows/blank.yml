@@ -1,0 +1,33 @@
+name: Add Issue to Project
+
+on:
+  issues:
+    types:
+      - opened
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Add to Project
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const payload = JSON.stringify({
+            project_card: {
+              content_type: 'Issue',
+              content_id: context.payload.issue.id
+            }
+          });
+          
+          const response = await octokit.request('POST /projects/columns/cards', {
+            column_id: 'COLUMN_ID', // Заменете с идентификатора на колоната ви в проекта
+            mediaType: {
+              previews: ['inertia']
+            },
+            data: payload
+          });
+          
+          console.log(response.data);
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
